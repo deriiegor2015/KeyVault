@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>KeyVault Python у браузері</title>
+    <!-- Підключаємо Python для браузера (Brython) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.0/brython.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.0/brython_stdlib.js"></script>
+    <style>
+        body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+        input, button { background: #161b22; color: #7ee787; border: 1px solid #30363d; padding: 8px; font-family: monospace; border-radius: 5px; margin: 5px 0; }
+        button { background: #238636; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2ea043; }
+        pre { background: #161b22; padding: 15px; border-radius: 5px; border: 1px solid #30363d; color: #58a6ff; }
+    </style>
+</head>
+<body onload="brython()">
+
+    <h2>=== KeyVault: Генератор паролів ===</h2>
+    
+    <label>Довжина пароля:</label><br>
+    <input type="number" id="lengthInput" value="12"><br>
+    
+    <label>Спецсимволи (!@#$)? (y/n):</label><br>
+    <input type="text" id="specialInput" value="y"><br>
+    
+    <button id="genBtn">Згенерувати пароль</button>
+
+    <h3>Результат:</h3>
+    <pre id="output">Тут з'явиться твій пароль...</pre>
+
+    <script type="text/python">
+        import random
+        import string
+        from browser import document, html
+
+        def generate_password(length=12, use_special=True):
+            letters = string.ascii_letters
+            digits = string.digits
+            special = string.punctuation if use_special else ""
+            all_chars = letters + digits + special
+            return "".join(random.choice(all_chars) for _ in range(length))
+
+        def on_click(e):
+            try:
+                length_val = document["lengthInput"].value
+                length = int(length_val) if length_val else 12
+                
+                special_val = document["specialInput"].value.strip().lower()
+                use_special = False if special_val == 'n' else True
+                
+                password = generate_password(length, use_special)
+                
+                document["output"].text = f"Твій новий пароль: {password}"
+            except ValueError:
+                document["output"].text = "Помилка: введи число для довжини."
+
+        document["genBtn"].bind("click", on_click)
+    </script>
+
+</body>
+</html>
